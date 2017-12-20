@@ -1,0 +1,63 @@
+// 初始化代码
+h1,h2,h3,h4,h5,h6{
+    margin: 0;
+}
+
+html,body{
+    width:100vw;
+    height: 100vh;
+    overflow: hidden;
+    margin:0;
+    -webkit-font-smoothing:antialiased;
+}
+
+.b-cover{
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.b-contain{
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+// 水平垂直居中
+.c{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate3d(-50%,-50%,0);
+}
+
+// 遮罩
+.mk{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+ul{
+    padding: 0;
+    list-style: none;
+    margin: 0;
+}
+
+/**
+* px单位转换到rem单位 设计稿750 iPhone6下的二倍稿
+* 使用方法 tr(750) 会被自动转换为 3.75rem
+*/
+@function tr($px){
+    @return $px/200*1rem;
+}
+
+/**
+* px单位转换到vh单位 设计稿750 iPhone6下的二倍稿
+* 使用方法 vh(1206) 会被自动转换为 100vh
+*/
+@function vh($px){
+    @return $px/12.06*1vh;
+}
