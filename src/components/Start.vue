@@ -1,5 +1,6 @@
 <template>
     <section class='wrap'>
+        <!-- 选择 -->
         <section class='main-container'>
             <div :style="{backgroundImage:'url('+ curContentImg +')'}" class='main-img'></div>
             <div class='main-text-container'>
@@ -16,11 +17,21 @@
         </ul>
         <div class='sure-button' @click='createCard' v-show='sureButton'></div>
 
-        <!-- 结束页 -->
+        <!-- 分享 -->
         <div class='envelope-bottom'></div>
         <div class='envelope-top'></div>
         <div class='envelope-animation'></div>
+        <div class='envelope-hack'></div>
         <img class='save-envelope' :src="envelopeData" v-show='envelopeData' />
+        <div class='share-button' @click='share' v-show='shareButtonShow'></div>
+        <section class='share-animation'>
+            <div class='share-weixin'></div>
+            <div class='share-save'>
+                <div class='share-finger'></div>
+                <div class='share-text'>长按保存图片后发送给好友</div>
+            </div>
+        </section>
+
 
         <!-- 生成合图辅助 -->
         <section class="transform-bg"></section>
@@ -131,7 +142,8 @@
                 resultData: {},
                 moveContainer: true,
                 sureButton: true,
-                wishButtonShow:true,
+                wishButtonShow: true,
+                shareButtonShow: true,
                 envelopeData: '', // 信封的base64数据
                 name: '脚皮哥'
             };
@@ -188,25 +200,44 @@
             },
             createEnvelopeCapture() {
                 const m = document.getElementsByClassName('transform-mask')[0];
-                // const qrcode=document.getElementsByClassName('qrcode')[0];
-                // const q=document.getElementsByClassName('m')[0];
+                const qrcode = document.getElementsByClassName('qrcode')[0];
+                const q = document.getElementsByClassName('m')[0];
                 // qrcode.style.transform = 'scale(2)';
                 // q.style.transform = 'scale(2)';
-                m.style.transform = 'scale(2)';
+                // m.style.transform = 'scale(2)';
+                // m.style.webkitTransform = 'scale(2)';
+                // this.helpTransform(m);
+                // this.helpTransform(qrcode);
+
                 this.html2canvas(m).then((canvas) => {
                     const img = this.toImage(canvas);
                     this.envelopeData = img;
                 });
+
+            },
+            helpTransform(elm) {
+                elm.style.transform = 'scale(2)';
+                elm.style.webkitTransform = 'scale(2)';
+                elm.style.transformOrigin = "0% 0% 0px";
+                elm.style.webkitTransformOrigin = "0% 0% 0px";
+
             },
             toImage(canvas) {
                 return canvas.toDataURL();
             },
             createCard() {
-                this.showEnvelope();
-                // this.recordData();
-                // this.addToQRcode();
-                // this.createEnvelopeCapture();
+
+                // 生成合图
+                this.recordData();
+                this.addToQRcode();
+                this.createEnvelopeCapture();
+
+                // 隐藏节点
                 this.hideElm();
+
+                // 信封动画
+                this.showEnvelope();
+
             },
             recordData() {
                 if (this.curText == '') {
@@ -225,36 +256,53 @@
             hideElm() { // 隐藏相关元素
                 this.moveContainer = false;
                 this.sureButton = false;
-                this.wishButtonShow=false;
+                this.wishButtonShow = false;
             },
             showEnvelope() { // 显示信封
-                const envelopeBottom=document.getElementsByClassName('envelope-bottom')[0];
-                const envelopeTop=document.getElementsByClassName('envelope-top')[0];
-                envelopeBottom.style.display='block';
-                envelopeTop.style.display='block';
-                setTimeout(()=>{
-                    envelopeBottom.style.transform='translate3d(-50%,-60vh,0)';
-                    envelopeTop.style.transform='translate3d(-50%,-60vh,0)';
-                },0)
+                const envelopeBottom = document.getElementsByClassName('envelope-bottom')[0];
+                const envelopeTop = document.getElementsByClassName('envelope-top')[0];
+                envelopeBottom.style.display = 'block';
+                envelopeTop.style.display = 'block';
+                setTimeout(() => {
+                    envelopeBottom.style.transform = 'translate3d(-50%,-68vh,0)';
+                    envelopeTop.style.transform = 'translate3d(-50%,-70vh,0)';
+                }, 0)
 
-                const letter=document.getElementsByClassName('main-container')[0];
-                envelopeBottom.addEventListener('transitionend',()=>{
-                    letter.style.transform='translate3d(0,14vh,0)';
+                const letter = document.getElementsByClassName('main-container')[0];
+                envelopeBottom.addEventListener('transitionend', () => {
+                    letter.style.transform = 'translate3d(0,5vh,0)';
                 })
 
-                const envelopeAnimation=document.getElementsByClassName('envelope-animation')[0];
-                letter.addEventListener('transitionend',()=>{
-                    envelopeAnimation.style.display='block';
-                    envelopeTop.style.display='none';
-                    setTimeout(()=>{
-                        envelopeAnimation.style.transform='translate3d(-50%,0,0) rotateX(-180deg)';
-                    },0)
+                const envelopeAnimation = document.getElementsByClassName('envelope-animation')[0];
+                letter.addEventListener('transitionend', () => {
+                    envelopeAnimation.style.display = 'block';
+                    envelopeTop.style.display = 'none';
+                    setTimeout(() => {
+                        envelopeAnimation.style.transform = 'translate3d(-50%,0,0) rotateX(-180deg)';
+                    }, 0)
                 })
 
+                const envelope = document.getElementsByClassName('save-envelope')[0];
+                const shareButton = document.getElementsByClassName('share-button')[0];
+                envelopeAnimation.addEventListener('transitionend', () => {
+                    envelope.style.display = 'block';
+                    shareButton.style.display = 'block';
+                    setTimeout(() => {
+                        envelope.style.opacity = '1';
+                        shareButton.style.opacity = '1';
+                    })
+                })
+            },
+            share() {
+                this.shareButtonShow = false;
+                const shareMask = document.getElementsByClassName('share-animation')[0];
+                shareMask.style.display = 'block';
+                setTimeout(() => {
+                    shareMask.style.opacity = '1';
+                }, 0)
             }
         },
         mounted() {
-
         }
     };
 
@@ -301,8 +349,8 @@
             padding-right: tr(30);
             box-sizing: border-box;
         }
-        .wish-author{
-            color: RGB(173,173,172);
+        .wish-author {
+            color: RGB(173, 173, 172);
             margin-top: vh(14);
             margin-bottom: vh(10);
         }
@@ -379,13 +427,34 @@
         background-image: url('../assets/img/start-button.png');
     }
 
-    .save-envelope {
-        width: 2rem;
-        height: 2rem;
+    .share-button {
+        display: none;
+        width: tr(463);
+        height: tr(88);
         @extend .b-contain;
+        position: absolute;
+        top: vh(1074);
+        left: 50%;
+        transform: translate3d(-50%, 0, 0);
+        background-image: url('../assets/img/share-button.png');
+        opacity: 0;
+        transition: opacity .6s linear;
     }
 
-    .envelope-bottom{
+    .save-envelope {
+        display: none;
+        position: absolute;
+        z-index: 100;
+        top: 13.1vh;
+        left: 50%;
+        transform: translate3d(-50%, 0, 0);
+        width: tr(558);
+        height: 3.7rem;
+        opacity: 0;
+        transition: opacity .6s linear;
+    }
+
+    .envelope-bottom {
         display: none;
         width: tr(558);
         height: tr(756);
@@ -395,11 +464,11 @@
         z-index: 10;
         top: 80vh;
         left: 50%;
-        transform: translate3d(-50%,0,0);
+        transform: translate3d(-50%, 0, 0);
         transition: transform 1.2s ease-in-out;
     }
 
-    .envelope-top{
+    .envelope-top {
         display: none;
         width: tr(558);
         height: tr(550);
@@ -410,24 +479,64 @@
         z-index: 1;
         top: 60vh;
         left: 50%;
-        transform: translate3d(-50%,0,0);
+        transform: translate3d(-50%, 0, 0);
         transition: transform 1.2s ease-in-out;
     }
 
-    .envelope-animation{
+    .envelope-animation {
         display: none;
         width: tr(558);
-        height: 1.5rem;
+        height: 24vh;
         position: absolute;
         z-index: 100;
-        top: -3vh;
+        top: -11vh;
         left: 50%;
-        transform: translate3d(-50%,0,0) rotateX(0deg);
+        transform: translate3d(-50%, 0, 0) rotateX(0deg);
         transform-origin: bottom;
         @extend .b-cover;
         background-image: url('../assets/img/envelope-top.png');
-        background-position-y:top;
+        background-position-y: top;
         transition: transform .8s ease-in-out;
+    }
+
+    .share-animation {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        font-size: .16rem;
+        color: #fff;
+        width: 100vw;
+        height: 100vh;
+        display: none;
+        opacity: 0;
+        transition: opacity .6s linear;
+    }
+
+    .share-weixin {
+        position: absolute;
+        width: tr(264);
+        height: tr(138);
+        right: tr(53);
+        top: 0;
+        @extend .b-contain;
+        background-image: url('../assets/img/share-weixin.png');
+    }
+
+    .share-save {
+        position: absolute;
+        top: vh(978);
+        left: 50%;
+        transform: translate3d(-50%, 0, 0);
+        white-space: nowrap;
+    }
+
+    .share-finger {
+        width: tr(44);
+        height: tr(68);
+        @extend .b-contain;
+        background-image: url('../assets/img/share-finger.png');
+        margin: 0 auto vh(20);
     }
 
     .transform-bg {
@@ -446,20 +555,19 @@
         left: 0;
         z-index: -999;
         .m {
-            width: 2rem;
-            height: 2rem;
-            @extend .b-contain;
-            background-image: url('../assets/img/mask.png');
+            width: tr(558);
+            height: 3.7rem;
+            @extend .b-cover;
+            background-image: url('../assets/img/envelope.png');
         }
         .qrcode {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: .6rem;
-            height: .6rem;
+            top: 22vh;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            width: tr(162);
+            height: tr(162);
             @extend .b-contain;
-            margin-left: .7rem;
-            margin-top: .7rem;
         }
         .qrcode-cache {
             display: none;
