@@ -6,11 +6,12 @@ import App from './App';
 import router from './router';
 import sdk from './config/sdk';
 import { isWeixinBrowser } from './config/util';
+import axios from 'axios'
 import html2canvas from 'html2canvas';
-
 
 Vue.config.productionTip = false;
 Vue.prototype.html2canvas=html2canvas;
+Vue.prototype.axios=axios;
 
 // if (isWeixinBrowser()) {
 //   // 微信环境下配置微信权限 需要上到平台才能正常调试微信接口

@@ -145,7 +145,8 @@
                 wishButtonShow: true,
                 shareButtonShow: true,
                 envelopeData: '', // 信封的base64数据
-                name: '脚皮哥'
+                name: '脚皮哥',
+                _id: ''
             };
         },
         computed: {
@@ -225,7 +226,11 @@
             toImage(canvas) {
                 return canvas.toDataURL();
             },
-            createCard() {
+            // 点击生成信封入口事件
+            async createCard() {
+                // 请求接口保存祝福
+                const res = await this.saveWish();
+                this._id = res.data.msg._id;
 
                 // 生成合图
                 this.recordData();
@@ -239,6 +244,18 @@
                 this.showEnvelope();
 
             },
+            saveWish() {
+                return this.axios({
+                    method: 'post',
+                    url: 'http://api.24haowan.com/save_user_info?game_id=AirmateCard&openid=-1',
+                    data: {
+                        content: JSON.stringify({
+                            name: '强子',
+                            text: '冬至快乐！'
+                        })
+                    }
+                })
+            },
             recordData() {
                 if (this.curText == '') {
                     this.resultData.wishText = this.wishText
@@ -249,7 +266,7 @@
             },
             addToQRcode() {
                 // 拼接数据生成二维码
-                let location = window.location.href;
+                let location = window.location.href + '?_id=' + this._id;
                 // location+='?'+this.resultData.wishText+'|'+this.resultData.bannerIndex;
                 this.createQRcode(location);
             },
@@ -302,13 +319,12 @@
                 }, 0)
             }
         },
-        mounted() {
-        }
+        mounted() {}
     };
 
 </script>
 
-<style lang='scss'>
+<style lang='scss' scoped>
     @import '../assets/scss/extend.scss';
     .wrap {
         width: 100vw;
@@ -316,261 +332,261 @@
         @extend .b-cover;
         background-image: url('../assets/img/start-bg.png');
         overflow: hidden;
-    }
 
-    .main-container {
-        width: tr(516);
-        height: tr(723);
-        margin: vh(100) auto vh(32);
-        position: relative;
-        z-index: 5;
-        box-sizing: border-box;
-        border: .04rem solid #fff;
-        border-radius: .1rem;
-        overflow: hidden;
-        transition: transform .6s ease-in-out;
-        .main-img {
-            width: 100%;
-            height: 100%;
-            @extend .b-cover;
-            position: absolute;
+        .main-container {
+            width: tr(516);
+            height: tr(723);
+            margin: vh(100) auto vh(32);
+            position: relative;
+            z-index: 5;
+            box-sizing: border-box;
+            border: .04rem solid #fff;
+            border-radius: .1rem;
+            overflow: hidden;
+            transition: transform .6s ease-in-out;
+            .main-img {
+                width: 100%;
+                height: 100%;
+                @extend .b-cover;
+                position: absolute;
+            }
+
+            .main-text-container {
+                font-weight: bold;
+                color: #fff;
+                font-size: .14rem;
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                height: tr(160);
+                background-color: rgba(0, 0, 0, .5);
+                padding-left: tr(25);
+                padding-right: tr(30);
+                box-sizing: border-box;
+            }
+            .wish-author {
+                color: RGB(173, 173, 172);
+                margin-top: vh(14);
+                margin-bottom: vh(10);
+            }
+            .wish-text {
+                display: block;
+                width: 100%;
+                background: rgba(0, 0, 0, 0);
+                outline: none;
+                border: none;
+                color: #fff;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 0;
+                padding-bottom: .1rem;
+            }
+            .change-wish {
+                position: absolute;
+                top: tr(14);
+                right: tr(23);
+                width: tr(123);
+                height: tr(42);
+                @extend .b-contain;
+                background-image: url('../assets/img/start-change.png');
+            }
         }
 
-        .main-text-container {
-            font-weight: bold;
+        .move-container {
+            font-size: .12rem;
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             color: #fff;
-            font-size: .14rem;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: tr(160);
-            background-color: rgba(0, 0, 0, .5);
-            padding-left: tr(25);
-            padding-right: tr(30);
-            box-sizing: border-box;
+            li {
+                margin: 0 tr(27);
+            }
+            i {
+                border-radius: .04rem;
+                width: tr(107);
+                height: tr(107);
+                display: block;
+                @extend .b-contain;
+                margin-bottom: tr(10);
+            }
+            li {
+                display: inline-block;
+                text-align: center;
+            }
+            i::before {
+                content: '';
+                display: block;
+                width: 100%;
+                height: 100%;
+                border: .01rem solid #fff;
+                border-radius: .04rem;
+                box-sizing: border-box;
+            }
+            .high-light::before {
+                content: '';
+                display: block;
+                width: 100%;
+                height: 100%;
+                border: .01rem solid RGB(213, 227, 106);
+                border-radius: .04rem;
+                box-sizing: border-box;
+            }
         }
-        .wish-author {
-            color: RGB(173, 173, 172);
-            margin-top: vh(14);
-            margin-bottom: vh(10);
-        }
-        .wish-text {
-            display: block;
-            width: 100%;
-            background: rgba(0, 0, 0, 0);
-            outline: none;
-            border: none;
-            color: #fff;
-            font-size: 14px;
-            font-weight: bold;
-            padding: 0;
-            padding-bottom: .1rem;
-        }
-        .change-wish {
-            position: absolute;
-            top: tr(14);
-            right: tr(23);
-            width: tr(123);
-            height: tr(42);
+
+        .sure-button {
+            margin: vh(50) auto 0;
+            width: tr(463);
+            height: tr(88);
+            font-size: 16px;
             @extend .b-contain;
-            background-image: url('../assets/img/start-change.png');
+            background-image: url('../assets/img/start-button.png');
         }
-    }
 
-    .move-container {
-        font-size: .12rem;
-        display: flex;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        color: #fff;
-        li {
-            margin: 0 tr(27);
-        }
-        i {
-            border-radius: .04rem;
-            width: tr(107);
-            height: tr(107);
-            display: block;
+        .share-button {
+            display: none;
+            width: tr(463);
+            height: tr(88);
             @extend .b-contain;
-            margin-bottom: tr(10);
-        }
-        li {
-            display: inline-block;
-            text-align: center;
-        }
-        i::before {
-            content: '';
-            display: block;
-            width: 100%;
-            height: 100%;
-            border: .01rem solid #fff;
-            border-radius: .04rem;
-            box-sizing: border-box;
-        }
-        .high-light::before {
-            content: '';
-            display: block;
-            width: 100%;
-            height: 100%;
-            border: .01rem solid RGB(213, 227, 106);
-            border-radius: .04rem;
-            box-sizing: border-box;
-        }
-    }
-
-    .sure-button {
-        margin: vh(50) auto 0;
-        width: tr(463);
-        height: tr(88);
-        font-size: 16px;
-        @extend .b-contain;
-        background-image: url('../assets/img/start-button.png');
-    }
-
-    .share-button {
-        display: none;
-        width: tr(463);
-        height: tr(88);
-        @extend .b-contain;
-        position: absolute;
-        top: vh(1074);
-        left: 50%;
-        transform: translate3d(-50%, 0, 0);
-        background-image: url('../assets/img/share-button.png');
-        opacity: 0;
-        transition: opacity .6s linear;
-    }
-
-    .save-envelope {
-        display: none;
-        position: absolute;
-        z-index: 100;
-        top: 13.1vh;
-        left: 50%;
-        transform: translate3d(-50%, 0, 0);
-        width: tr(558);
-        height: 3.7rem;
-        opacity: 0;
-        transition: opacity .6s linear;
-    }
-
-    .envelope-bottom {
-        display: none;
-        width: tr(558);
-        height: tr(756);
-        @extend .b-cover;
-        background-image: url('../assets/img/envelope-bottom.png');
-        position: absolute;
-        z-index: 10;
-        top: 80vh;
-        left: 50%;
-        transform: translate3d(-50%, 0, 0);
-        transition: transform 1.2s ease-in-out;
-    }
-
-    .envelope-top {
-        display: none;
-        width: tr(558);
-        height: tr(550);
-        @extend .b-cover;
-        background-position: top center;
-        background-image: url('../assets/img/envelope-top.png');
-        position: absolute;
-        z-index: 1;
-        top: 60vh;
-        left: 50%;
-        transform: translate3d(-50%, 0, 0);
-        transition: transform 1.2s ease-in-out;
-    }
-
-    .envelope-animation {
-        display: none;
-        width: tr(558);
-        height: 24vh;
-        position: absolute;
-        z-index: 100;
-        top: -11vh;
-        left: 50%;
-        transform: translate3d(-50%, 0, 0) rotateX(0deg);
-        transform-origin: bottom;
-        @extend .b-cover;
-        background-image: url('../assets/img/envelope-top.png');
-        background-position-y: top;
-        transition: transform .8s ease-in-out;
-    }
-
-    .share-animation {
-        position: absolute;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        font-size: .16rem;
-        color: #fff;
-        width: 100vw;
-        height: 100vh;
-        display: none;
-        opacity: 0;
-        transition: opacity .6s linear;
-    }
-
-    .share-weixin {
-        position: absolute;
-        width: tr(264);
-        height: tr(138);
-        right: tr(53);
-        top: 0;
-        @extend .b-contain;
-        background-image: url('../assets/img/share-weixin.png');
-    }
-
-    .share-save {
-        position: absolute;
-        top: vh(978);
-        left: 50%;
-        transform: translate3d(-50%, 0, 0);
-        white-space: nowrap;
-    }
-
-    .share-finger {
-        width: tr(44);
-        height: tr(68);
-        @extend .b-contain;
-        background-image: url('../assets/img/share-finger.png');
-        margin: 0 auto vh(20);
-    }
-
-    .transform-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: -998;
-        width: 100vw;
-        height: 100vh;
-        background-color: #fff;
-    }
-
-    .transform-mask {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: -999;
-        .m {
-            width: tr(558);
-            height: 3.7rem;
-            @extend .b-cover;
-            background-image: url('../assets/img/envelope.png');
-        }
-        .qrcode {
             position: absolute;
-            top: 22vh;
+            top: vh(1074);
             left: 50%;
             transform: translate3d(-50%, 0, 0);
-            width: tr(162);
-            height: tr(162);
-            @extend .b-contain;
+            background-image: url('../assets/img/share-button.png');
+            opacity: 0;
+            transition: opacity .6s linear;
         }
-        .qrcode-cache {
+
+        .save-envelope {
             display: none;
+            position: absolute;
+            z-index: 100;
+            top: 13.1vh;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            width: tr(558);
+            height: 3.7rem;
+            opacity: 0;
+            transition: opacity .6s linear;
+        }
+
+        .envelope-bottom {
+            display: none;
+            width: tr(558);
+            height: tr(756);
+            @extend .b-cover;
+            background-image: url('../assets/img/envelope-bottom.png');
+            position: absolute;
+            z-index: 10;
+            top: 80vh;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            transition: transform 1.2s ease-in-out;
+        }
+
+        .envelope-top {
+            display: none;
+            width: tr(558);
+            height: tr(550);
+            @extend .b-cover;
+            background-position: top center;
+            background-image: url('../assets/img/envelope-top.png');
+            position: absolute;
+            z-index: 1;
+            top: 60vh;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            transition: transform 1.2s ease-in-out;
+        }
+
+        .envelope-animation {
+            display: none;
+            width: tr(558);
+            height: 24vh;
+            position: absolute;
+            z-index: 100;
+            top: -11vh;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0) rotateX(0deg);
+            transform-origin: bottom;
+            @extend .b-cover;
+            background-image: url('../assets/img/envelope-top.png');
+            background-position-y: top;
+            transition: transform .8s ease-in-out;
+        }
+
+        .share-animation {
+            position: absolute;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            font-size: .16rem;
+            color: #fff;
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            opacity: 0;
+            transition: opacity .6s linear;
+        }
+
+        .share-weixin {
+            position: absolute;
+            width: tr(264);
+            height: tr(138);
+            right: tr(53);
+            top: 0;
+            @extend .b-contain;
+            background-image: url('../assets/img/share-weixin.png');
+        }
+
+        .share-save {
+            position: absolute;
+            top: vh(978);
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            white-space: nowrap;
+        }
+
+        .share-finger {
+            width: tr(44);
+            height: tr(68);
+            @extend .b-contain;
+            background-image: url('../assets/img/share-finger.png');
+            margin: 0 auto vh(20);
+        }
+
+        .transform-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -998;
+            width: 100vw;
+            height: 100vh;
+            background-color: #fff;
+        }
+
+        .transform-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -999;
+            .m {
+                width: tr(558);
+                height: 3.7rem;
+                @extend .b-cover;
+                background-image: url('../assets/img/envelope.png');
+            }
+            .qrcode {
+                position: absolute;
+                top: 22vh;
+                left: 50%;
+                transform: translate3d(-50%, 0, 0);
+                width: tr(162);
+                height: tr(162);
+                @extend .b-contain;
+            }
+            .qrcode-cache {
+                display: none;
+            }
         }
     }
 
