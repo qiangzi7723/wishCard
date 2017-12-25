@@ -233,7 +233,6 @@
                 this._id = res.data.msg._id;
 
                 // 生成合图
-                this.recordData();
                 this.addToQRcode();
                 this.createEnvelopeCapture();
 
@@ -245,29 +244,31 @@
 
             },
             saveWish() {
-                return this.axios({
-                    method: 'post',
-                    url: 'http://api.24haowan.com/save_user_info?game_id=AirmateCard&openid=-1',
-                    data: {
-                        content: JSON.stringify({
-                            name: '强子',
-                            text: '冬至快乐！'
-                        })
-                    }
-                })
-            },
-            recordData() {
+
                 if (this.curText == '') {
                     this.resultData.wishText = this.wishText
                 } else {
                     this.resultData.wishText = this.curText;
                 }
                 this.resultData.bannerIndex = this.highLightIndex;
+
+                return this.axios({
+                    method: 'post',
+                    url: 'http://api.24haowan.com/save_user_info?game_id=AirmateCard&openid=-1',
+                    data: {
+                        content: JSON.stringify({
+                            name: this.name,
+                            img:'',
+                            wishText: this.resultData.wishText,
+                            bannerIndex: this.resultData.bannerIndex
+                        })
+                    }
+                })
             },
             addToQRcode() {
                 // 拼接数据生成二维码
-                let location = window.location.href + '?_id=' + this._id;
-                // location+='?'+this.resultData.wishText+'|'+this.resultData.bannerIndex;
+                let location = window.location.origin + '/#/' + '?_id=' + this._id;
+                console.log(location);
                 this.createQRcode(location);
             },
             hideElm() { // 隐藏相关元素
@@ -319,12 +320,13 @@
                 }, 0)
             }
         },
-        mounted() {}
+        mounted() {
+        }
     };
 
 </script>
 
-<style lang='scss' scoped>
+<style lang='scss'>
     @import '../assets/scss/extend.scss';
     .wrap {
         width: 100vw;
